@@ -2,9 +2,11 @@ interface ISearchEngine {
   name: string;
   cname?: string;
   abbr: string[];
-  type: 'engine' | 'website' | 'video';
+  type: 'engine' | 'website' | 'video' | 'translate';
   searchUrl: string;
 }
+
+export type ITranslateEngine = 'google-translate' | 'baidu-translate' | 'deepl-translate';
 export const searchEngineMap: ISearchEngine[] = [
   {
     name: 'baidu',
@@ -28,17 +30,24 @@ export const searchEngineMap: ISearchEngine[] = [
     searchUrl: 'https://google.com/search?q=',
   },
   {
-    name: 'Being',
+    name: 'being',
     cname: '必应',
     abbr: ['be'],
     type: 'engine',
     searchUrl: 'https://www.bing.com/search?q=',
   },
   {
+    name: 'fsou',
+    cname: 'f搜',
+    type: 'engine',
+    abbr: ['fsou', 'f'],
+    searchUrl: 'https://fsoufsou.com/search?q=',
+  },
+  {
     name: 'github',
     abbr: ['gi'],
     type: 'website',
-    searchUrl: 'https://github.com/search?q=',
+    searchUrl: 'https://github.com/search?type=repositories&q=',
   },
   {
     name: 'stackoverflow',
@@ -99,17 +108,58 @@ export const searchEngineMap: ISearchEngine[] = [
     type: 'video',
     searchUrl: 'https://search.bilibili.com/all?keyword=',
   },
+  {
+    name: 'google-translate',
+    cname: 'google翻译',
+    abbr: ['gf'],
+    type: 'translate',
+    searchUrl: 'https://translate.google.com/?sl=',
+  },
+  {
+    name: 'deepl-translate',
+    type: 'translate',
+    cname: 'deepl',
+    abbr: ['dl'],
+    searchUrl: 'https://www.deepl.com/translator#',
+  },
+  {
+    name: 'baidu-translate',
+    type: 'translate',
+    cname: '百度翻译',
+    abbr: ['bf'],
+    searchUrl: 'https://fanyi.baidu.com/#',
+  },
+  {
+    name: 'baidubaike',
+    type: 'website',
+    cname: '百度百科',
+    abbr: ['bw'],
+    searchUrl: 'https://baike.baidu.com/item/',
+  },
+  {
+    name: 'wikipedia',
+    type: 'website',
+    cname: '维基百科',
+    abbr: ['wi'],
+    searchUrl: 'https://zh.wikipedia.org/wiki/',
+  },
 ];
 
 export const getEngineSymbol = (str: string): string => {
   const firstSpacePos = str.replace(/(^\s*)/g, '').indexOf(' ');
-  return str.substring(0, firstSpacePos);
+  return firstSpacePos > -1 ? str.substring(0, firstSpacePos) : '';
 };
 
 export const getEngineObj = (abbr: string): ISearchEngine | undefined => {
-  return searchEngineMap.find(item => item.abbr.includes(abbr) || item.name === abbr);
+  return searchEngineMap.find((item) => item.abbr.includes(abbr) || item.name === abbr);
 };
 
 export const getQuery = (str: string, abbr: string): string => {
-  return str.substring(abbr.length).trim().replace(/\s+/g, '+');
+  return str.substring(abbr.length).trim().replace(/\s+/g, ' ');
 };
+
+export const isChineseContained = (str: string) => /[\u4E00-\u9FA5]+/.test(str);
+
+export const isMobile = () => /android|webos|iphone|ipad/i.test(navigator.userAgent.toLowerCase());
+
+export const isMac = () => /macintosh | mac os x/i.test(navigator.userAgent);
